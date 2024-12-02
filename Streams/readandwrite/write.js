@@ -9,7 +9,7 @@ const writefunction = async () => {
    const writeData = () =>{
  
     while(i < 100000){
-        const Buff = Buffer.from(`${i} lets go `,"utf-8");
+        const Buff = Buffer.from(` ${i} `,"utf-8");
         if(i == 99999) return stream.end(Buff);
         if(!stream.write(Buff)) break;
         i++;
@@ -33,7 +33,13 @@ const readFunction = async () => {
    const stream2 = fd_w.createWriteStream();
    
    stream.on("data" , (chunk) =>{
-     if(! stream2.write(chunk) ){
+      
+      const arr = (chunk.toString("binary"));
+      const arr1 = arr.split("  ");
+      const data =  arr1.filter((value)=>{ if(value % 2 === 0 ) return value }).toString();
+      const data_to_string = data.replace(/,/g," ").trim();
+      const buff = Buffer.from(data_to_string,"utf-8");
+     if(! stream2.write(buff) ){
       stream.pause();   
      }
     
@@ -43,6 +49,8 @@ const readFunction = async () => {
    stream2.on("drain",()=>{
       stream.resume();
    })
+
+   stream.on("end", () => { stream2.end(); console.log('Finished processing files.'); });
 
 };
 
